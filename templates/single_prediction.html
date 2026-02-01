@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Single Prediction | E-commerce Churn Analysis</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet"> <!-- ✅ Bootstrap Icons -->
+
+    <style>
+    body {
+        font-family: 'Segoe UI', sans-serif;
+        background-color: #f5f8fc;
+        margin: 0;
+    }
+
+    .sidebar {
+        height: 100vh;
+        width: 220px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: linear-gradient(180deg, #4b0082, #6a0dad);
+        color: white;
+        padding-top: 30px;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .sidebar h4 {
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 40px;
+        letter-spacing: 1px;
+        color: #fff;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        margin: 5px 10px;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        font-weight: 600;
+    }
+
+    .sidebar a.active-link {
+        background-color: rgba(255, 255, 255, 0.35);
+        font-weight: 700;
+    }
+
+
+    .main-content {
+        margin-left: 220px;
+        padding: 30px;
+    }
+
+    .form-container {
+        max-width: 1100px;
+        margin: auto;
+    }
+
+    .card {
+        background-color: white;
+        border: 1px solid #ddd;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
+    }
+
+    .btn-custom {
+        background-color: #5a189a;
+        color: white;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: 600;
+        border-radius: 8px;
+        transition: 0.3s;
+    }
+
+    .btn-custom:hover {
+        background-color: #7f24dbff;
+    }
+
+    .form-label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+
+    input.form-control, select.form-select {
+        padding: 10px;
+        font-size: 15px;
+        border-radius: 6px;
+        border: 1px solid #ccc;
+    }
+
+    h2 {
+        font-weight: bold;
+        margin-bottom: 25px;
+    }
+
+    h4 {
+        font-weight: bold;
+        margin-bottom: 20px;
+    }
+
+    .alert {
+        font-size: 14px;
+    }
+
+    @media (max-width: 768px) {
+        .main-content {
+            margin-left: 0;
+            padding: 20px;
+        }
+
+        .sidebar {
+            position: relative;
+            height: auto;
+            width: 100%;
+        }
+
+        .form-container {
+            width: 100%;
+            padding: 0 10px;
+        }
+    }
+</style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+<nav class="sidebar">
+    <h4>Churn App</h4>
+    <a href="{{ url_for('bulk_upload') }}" class="{% if request.endpoint == 'bulk_upload' %}active-link{% endif %}">
+        <i class="bi bi-people-fill me-2"></i> Bulk Prediction
+    </a>
+    <a href="{{ url_for('single_prediction') }}" class="{% if request.endpoint == 'single_prediction' %}active-link{% endif %}">
+        <i class="bi bi-person-fill me-2"></i> Single Prediction
+    </a>
+    <a href="{{ url_for('visualizations') }}" class="{% if request.endpoint == 'visualizations' %}active-link{% endif %}">
+        <i class="bi bi-bar-chart-fill me-2"></i> Visualization
+    </a>
+    <a href="{{ url_for('recommendations') }}" class="{% if request.endpoint == 'recommendations' %}active-link{% endif %}">
+        <i class="bi bi-lightbulb-fill me-2"></i> Recommendation
+    </a>
+    <a href="{{ url_for('logout') }}">
+        <i class="bi bi-box-arrow-right me-2"></i> Logout
+    </a>
+</nav>
+
+<!-- Main Content -->
+    <div class="main-content">
+        <h2 class="text-center">Single Customer Churn Prediction</h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="alert alert-warning">
+              {% for msg in messages %}
+                <div>{{ msg }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <div class="col-md-12">
+            <div class="card p-4">
+                <form method="POST" action="{{ url_for('single_prediction') }}">
+                    <div class="row">
+                        <!-- Customer ID -->
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <label class="form-label">Customer ID</label>
+                            <input type="text" name="customer_id" class="form-control" placeholder="Enter Customer ID" required>
+                        </div>
+
+                        {% for feature in feature_names %}
+                        <div class="col-md-6 col-lg-4 mb-4">
+
+                            {% if feature == 'Gender' %}
+                                <label for="Gender" class="form-label">Gender</label>
+                                <select name="Gender" id="Gender" class="form-select" required>
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                </select>
+
+                            {% elif feature == 'MaritalStatus' %}
+                                <label for="MaritalStatus" class="form-label">Marital Status</label>
+                                <select name="MaritalStatus" id="MaritalStatus" class="form-select" required>
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option value="Single">Single</option>
+                                    <option value="Married">Married</option>
+                                    <option value="Divorced">Divorced</option>
+                                </select>
+
+                            {% elif feature == 'PreferredLoginDevice' %}
+                                <label for="PreferredLoginDevice" class="form-label">Login Device</label>
+                                <select name="PreferredLoginDevice" id="PreferredLoginDevice" class="form-select" required>
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option value="Phone">Phone</option>
+                                    <option value="Computer">Computer</option>
+                                </select>
+
+                            {% elif feature == 'PreferredPaymentMode' %}
+                                <label for="PreferredPaymentMode" class="form-label">Payment Mode</label>
+                                <select name="PreferredPaymentMode" id="PreferredPaymentMode" class="form-select" required>
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option value="Credit Card">Credit Card</option>
+                                    <option value="Debit Card">Debit Card</option>
+                                    <option value="UPI">UPI</option>
+                                    <option value="COD">Cash on Delivery</option>
+                                    <option value="E wallet">E wallet</option>
+                                </select>
+
+                            {% elif feature == 'PreferedOrderCat' %}
+                                <label for="PreferedOrderCat" class="form-label">Order Category</label>
+                                <select name="PreferedOrderCat" id="PreferedOrderCat" class="form-select" required>
+                                    <option value="" disabled selected>Select an option</option>
+                                    <option value="Fashion">Fashion</option>
+                                    <option value="Mobile">Mobile</option>
+                                    <option value="Grocery">Grocery</option>
+                                    <option value="Laptop & Its Accessories">Laptop & Its Accessories</option>
+                                </select>
+
+                            {% elif feature == 'Tenure' %}
+                                <label for="Tenure" class="form-label">Tenure</label>
+                                <input type="number" name="Tenure" id="Tenure" class="form-control" placeholder="0–100" min="0" max="100" required>
+
+                            {% elif feature == 'CityTier' %}
+                                <label for="CityTier" class="form-label">City Tier</label>
+                                <input type="number" name="CityTier" id="CityTier" class="form-control" placeholder="1–5" min="1" max="5" required>
+
+                            {% elif feature == 'WarehouseToHome' %}
+                                <label for="WarehouseToHome" class="form-label">Warehouse To Home Distance</label>
+                                <input type="number" name="WarehouseToHome" id="WarehouseToHome" class="form-control" placeholder="1–50" min="1" max="50" required>
+
+                            {% elif feature == 'HourSpendOnApp' %}
+                                <label for="HourSpendOnApp" class="form-label">Hours Spent on App</label>
+                                <input type="number" name="HourSpendOnApp" id="HourSpendOnApp" class="form-control" placeholder="0–5" min="0" max="5" required>
+
+                            {% elif feature == 'SatisfactionScore' %}
+                                <label for="SatisfactionScore" class="form-label">Satisfaction Score</label>
+                                <input type="number" name="SatisfactionScore" id="SatisfactionScore" class="form-control" placeholder="1–5" min="1" max="5" required>
+
+                            {% elif feature == 'NumberOfDeviceRegistered' %}
+                                <label for="NumberOfDeviceRegistered" class="form-label">Devices Registered</label>
+                                <input type="number" name="NumberOfDeviceRegistered" id="NumberOfDeviceRegistered" class="form-control" placeholder="1–10" min="1" max="10" required>
+
+                            {% elif feature == 'NumberOfAddress' %}
+                                <label for="NumberOfAddress" class="form-label">Number of Addresses</label>
+                                <input type="number" name="NumberOfAddress" id="NumberOfAddress" class="form-control" placeholder="1–10" min="1" max="10" required>
+
+                            {% elif feature == 'Complain' %}
+                                <label for="Complain" class="form-label">Complaint Raised?</label>
+                                <input type="number" name="Complain" id="Complain" class="form-control" placeholder="0 = No, 1 = Yes" min="0" max="1" required>
+
+                            {% elif feature == 'OrderAmountHikeFromlastYear' %}
+                                <label for="OrderAmountHikeFromlastYear" class="form-label">Order Amount Hike</label>
+                                <input type="number" name="OrderAmountHikeFromlastYear" id="OrderAmountHikeFromlastYear" class="form-control" placeholder="0–30" min="0" max="30" required>
+
+                            {% elif feature == 'CouponUsed' %}
+                                <label for="CouponUsed" class="form-label">Coupons Used</label>
+                                <input type="number" name="CouponUsed" id="CouponUsed" class="form-control" placeholder="0–5" min="0" max="5" required>
+
+                            {% elif feature == 'OrderCount' %}
+                                <label for="OrderCount" class="form-label">Order Count</label>
+                                <input type="number" name="OrderCount" id="OrderCount" class="form-control" placeholder="1–20" min="1" max="20" required>
+
+                            {% elif feature == 'DaySinceLastOrder' %}
+                                <label for="DaySinceLastOrder" class="form-label">Days Since Last Order</label>
+                                <input type="number" name="DaySinceLastOrder" id="DaySinceLastOrder" class="form-control" placeholder="1–365" min="1" max="365" required>
+
+                            {% elif feature == 'CashbackAmount' %}
+                                <label for="CashbackAmount" class="form-label">Cashback Amount</label>
+                                <input type="number" step="0.01" name="CashbackAmount" id="CashbackAmount" class="form-control" placeholder="e.g., 0–1000" min="0" required>
+
+                            {% else %}
+                                <label for="{{ feature }}" class="form-label">{{ feature|replace('_',' ') }}</label>
+                                <input type="number" name="{{ feature }}" id="{{ feature }}" class="form-control" placeholder="Enter value" required>
+                            {% endif %}
+
+                        </div>
+                        {% endfor %}
+
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100">Predict</button>
+                </form>
+
+                {% if result %}
+                <div id="prediction-result" class="mt-4 d-flex justify-content-center">
+                    <div class="card shadow border-0 rounded-3 text-center" style="max-width: 350px; width: 100%;">
+                        <div class="card-body p-4">
+                            {% if result == 'Churn' %}
+                                <h5 class="badge bg-danger px-4 py-2 fs-5">Churn</h5>
+                            {% else %}
+                                <h5 class="badge bg-success px-4 py-2 fs-5">Not Churn</h5>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+            </div>
+        </div>
+    </div>
+
+
+</body>
+</html>

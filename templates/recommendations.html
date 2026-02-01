@@ -1,0 +1,119 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: #f5f8fc;
+            margin: 0;
+        }
+
+        .custom-purple-btn {
+            background-color: #5a189a; /* deep purple */
+            border: none;
+            color: white;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: 0.3s;
+        }
+
+        .custom-purple-btn:hover {
+            background-color: #4b0082; /* darker purple on hover */
+            color: #fff;
+        }
+
+        .sidebar {
+        height: 100vh;
+        width: 220px;
+        position: fixed;
+        top: 0;
+        left: 0;
+        background: linear-gradient(180deg, #4b0082, #6a0dad);
+        color: white;
+        padding-top: 30px;
+        box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+        z-index: 1000;
+    }
+
+    .sidebar h4 {
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 40px;
+        letter-spacing: 1px;
+        color: #fff;
+    }
+
+    .sidebar a {
+        display: flex;
+        align-items: center;
+        padding: 12px 20px;
+        margin: 5px 10px;
+        color: white;
+        text-decoration: none;
+        font-weight: 500;
+        border-radius: 8px;
+        transition: 0.2s;
+    }
+
+    .sidebar a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        font-weight: 600;
+    }
+
+    .sidebar a.active-link {
+        background-color: rgba(255, 255, 255, 0.35);
+        font-weight: 700;
+    }
+
+    </style>
+
+
+<!-- Sidebar -->
+<nav class="sidebar">
+    <h4>Churn App</h4>
+    <a href="{{ url_for('bulk_upload') }}" class="{% if request.endpoint == 'bulk_upload' %}active-link{% endif %}">
+        <i class="bi bi-people-fill me-2"></i> Bulk Prediction
+    </a>
+    <a href="{{ url_for('single_prediction') }}" class="{% if request.endpoint == 'single_prediction' %}active-link{% endif %}">
+        <i class="bi bi-person-fill me-2"></i> Single Prediction
+    </a>
+    <a href="{{ url_for('visualizations') }}" class="{% if request.endpoint == 'visualizations' %}active-link{% endif %}">
+        <i class="bi bi-bar-chart-fill me-2"></i> Visualization
+    </a>
+    <a href="{{ url_for('recommendations') }}" class="{% if request.endpoint == 'recommendations' %}active-link{% endif %}">
+        <i class="bi bi-lightbulb-fill me-2"></i> Recommendation
+    </a>
+    <a href="{{ url_for('logout') }}">
+        <i class="bi bi-box-arrow-right me-2"></i> Logout
+    </a>
+</nav>
+
+<div class="container mt-5">
+    <h2 class="text-center mb-4">Customer Churn Recommendations</h2>
+       
+    <div class="col-md-9">
+        {% if recommendations %}
+            <div class="card mb-4">
+                <ul class="list-group list-group-flush" style="max-height: 400px; overflow-y: auto;">
+                    {% for rec in recommendations %}
+                        <li class="list-group-item">{{ rec }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+            <!-- Download PDF button -->
+            <form method="POST" action="{{ url_for('recommendations') }}">
+                <button type="submit" class="btn custom-purple-btn">
+                    📥 Download PDF
+                </button>
+            </form>
+        {% else %}
+            <div class="alert alert-info" role="alert">
+                No recommendations available. Please upload and predict data first.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Login | E-commerce Customer Churn Analysis & Prediction System</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(to right, #7b2cbf, #9d4edd);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', sans-serif;
+            color: #fff;
+        }
+
+        .login-box {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .login-box h2 {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 1rem;
+            color: #fff;
+        }
+
+        .form-control {
+            border-radius: 10px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: #fff;
+            border: none;
+        }
+
+        .form-control::placeholder {
+            color: #eee;
+        }
+
+        .btn-login {
+            background-color: #fff;
+            color: #7b2cbf;
+            font-weight: bold;
+            border-radius: 12px;
+            margin-top: 1rem;
+        }
+
+        .signup-link {
+            text-align: center;
+            margin-top: 15px;
+            color: #ddd;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+
+        a {
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <h2>E-Commerce Customer Churn Analysis & Prediction System</h2>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <div class="error-message">
+              {% for msg in messages %}
+                <div>{{ msg }}</div>
+              {% endfor %}
+            </div>
+          {% endif %}
+        {% endwith %}
+
+        <form method="post">
+            <div class="mb-3">
+                <input type="text" name="username" class="form-control" placeholder="Username" required>
+            </div>
+            <div class="mb-3">
+                <input type="password" name="password" class="form-control" placeholder="Password" required>
+            </div>
+            <button type="submit" class="btn btn-login w-100">Login</button>
+        </form>
+
+        <div class="signup-link">
+            Don't have an account? 
+            <a href="{{ url_for('signup') }}" class="text-warning">Signup here</a>
+        </div>
+    </div>
+</body>
+</html>
