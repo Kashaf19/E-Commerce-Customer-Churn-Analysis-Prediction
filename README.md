@@ -104,7 +104,3 @@ Some key features used in this project:
 **Kashaf Shahid**
 BS Data Science
 Data Sciencetist
-* Add **screenshots section**
-* Write a **requirements.txt**
-
-Just tell me 👍
