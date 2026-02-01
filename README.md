@@ -102,5 +102,4 @@ Some key features used in this project:
 ## 👩‍💻 Author
 
 **Kashaf Shahid**
-BS Data Science
 Data Sciencetist
